@@ -1,191 +1,92 @@
-import { useState, useEffect } from "react";
-import { supabase } from "./store/Superbase";
+import React, { useState } from "react";
+import TransactionForm from "./module/TransactionForm";
+import TransactionList from "./module/TransactionList";
 
-export default function App() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    getUsers();
-  }, []);
-
-  const getUsers = async () => {
-    const { data, error } = await supabase.from("User").select("*");
-
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    setUsers(data);
-  };
-
-  const addUser = async () => {
-    const { error } = await supabase.from("User").insert([
-      {
-        username,
-        email,
-        password,
-      },
-    ]);
-
-    if (error) {
-      console.log(error);
-      alert(error.message);
-      return;
-    }
-
-    setUsername("");
-    setEmail("");
-    setPassword("");
-
-    getUsers();
-  };
-
+// ── Page components ──────────────────────────────────────
+function HomePage() {
   return (
-    // <div className="min-h-screen bg-gray-950 p-8">
-    //   <div className="max-w-md mx-auto">
-    //     <h1 className="text-3xl font-bold text-white mb-6">Supabase Users</h1>
-
-    //     <input
-    //       type="text"
-    //       placeholder="Username"
-    //       value={username}
-    //       onChange={(e) => setUsername(e.target.value)}
-    //       className="w-full p-3 mb-3 rounded bg-gray-800 text-white"
-    //     />
-
-    //     <input
-    //       type="email"
-    //       placeholder="Email"
-    //       value={email}
-    //       onChange={(e) => setEmail(e.target.value)}
-    //       className="w-full p-3 mb-3 rounded bg-gray-800 text-white"
-    //     />
-
-    //     <input
-    //       type="password"
-    //       placeholder="Password"
-    //       value={password}
-    //       onChange={(e) => setPassword(e.target.value)}
-    //       className="w-full p-3 mb-3 rounded bg-gray-800 text-white"
-    //     />
-
-    //     <button
-    //       onClick={addUser}
-    //       className="w-full bg-violet-600 text-white py-3 rounded"
-    //     >
-    //       Save User
-    //     </button>
-
-    //     <div className="mt-8">
-    //       {users.map((user) => (
-    //         <div
-    //           key={user.id}
-    //           className="bg-gray-800 text-white p-4 rounded mb-3"
-    //         >
-    //           <p>
-    //             <strong>ID:</strong> {user.id}
-    //           </p>
-    //           <p>
-    //             <strong>Username:</strong> {user.username}
-    //           </p>
-    //           <p>
-    //             <strong>Email:</strong> {user.email}
-    //           </p>
-    //           <p>
-    //             <strong>Password:</strong> {user.password}
-    //           </p>
-    //         </div>
-    //       ))}
-    //     </div>
-    //   </div>
-    // </div>
-
-    <div className="min-h-screen bg-gray-100 p-4">
-  <div className="max-w-md mx-auto space-y-4">
-
-    {/* Header */}
-    <div>
-      <h1 className="text-2xl font-bold">
-        Expense Tracker
-      </h1>
-      <p className="text-gray-500">
-        Hello, Chitram 👋
-      </p>
+    <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-500">
+      <span className="text-5xl">🏠</span>
+      <p className="text-xl font-medium text-gray-800">Home</p>
+      <p className="text-sm">Your dashboard overview</p>
     </div>
-
-    {/* Balance */}
-    <div className="bg-blue-600 text-white p-5 rounded-2xl">
-      <p>Total Balance</p>
-      <h2 className="text-3xl font-bold">
-        ₹24,500
-      </h2>
-    </div>
-
-    {/* Summary */}
-    <div className="grid grid-cols-2 gap-3">
-      <div className="bg-white p-4 rounded-xl shadow">
-        <p>Income</p>
-        <h3 className="text-green-600 font-bold">
-          ₹40,000
-        </h3>
-      </div>
-
-      <div className="bg-white p-4 rounded-xl shadow">
-        <p>Expense</p>
-        <h3 className="text-red-600 font-bold">
-          ₹15,500
-        </h3>
-      </div>
-
-      <div className="bg-white p-4 rounded-xl shadow">
-        <p>Lend</p>
-        <h3 className="text-orange-600 font-bold">
-          ₹5,000
-        </h3>
-      </div>
-
-      <div className="bg-white p-4 rounded-xl shadow">
-        <p>Borrow</p>
-        <h3 className="text-purple-600 font-bold">
-          ₹2,000
-        </h3>
-      </div>
-    </div>
-
-    {/* Transactions */}
-    <div className="bg-white rounded-xl p-4 shadow">
-      <h2 className="font-bold mb-3">
-        Recent Transactions
-      </h2>
-
-      <div className="space-y-3">
-        <div className="flex justify-between">
-          <span>Salary</span>
-          <span className="text-green-600">
-            +₹30,000
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Rent</span>
-          <span className="text-red-600">
-            -₹8,000
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Friend Loan</span>
-          <span className="text-orange-600">
-            -₹2,000
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
   );
 }
+
+function TransactionsPage() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-500">
+      <span className="text-5xl">💸</span>
+      <p className="text-xl font-medium text-gray-800">Transactions</p>
+      <p className="text-sm">Give & receive money</p>
+    </div>
+  );
+}
+
+function UserListPage() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-500">
+      <span className="text-5xl">👥</span>
+      <p className="text-xl font-medium text-gray-800">User List</p>
+      <p className="text-sm">Manage your friends</p>
+    </div>
+  );
+}
+
+function SettingsPage() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-500">
+      <span className="text-5xl">⚙️</span>
+      <p className="text-xl font-medium text-gray-800">Settings</p>
+      <p className="text-sm">App preferences</p>
+    </div>
+  );
+}
+
+// ── Tab config ────────────────────────────────────────────
+const tabs = [
+  { id: "home",         label: "Home",         icon: "🏠",  page: HomePage },
+  { id: "transactions", label: "Transactions", icon: "💸",  page: TransactionList },
+  { id: "users",        label: "Users",        icon: "👥",  page: TransactionForm },
+  { id: "settings",     label: "Settings",     icon: "⚙️", page: SettingsPage },
+];
+
+// ── App ───────────────────────────────────────────────────
+function App() {
+  const [activeTab, setActiveTab] = useState("home");
+
+  const ActivePage = tabs.find((t) => t.id === activeTab)?.page;
+
+  return (
+    <div className="flex flex-col h-screen bg-white max-w-sm mx-auto">
+
+      {/* Page content */}
+      <main className="flex-1 overflow-y-auto pb-16">
+        {ActivePage && <ActivePage />}
+      </main>
+
+      {/* Bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0 max-w-sm mx-auto
+               flex bg-white border-t border-gray-100 z-50">
+        {tabs.map(({ id, label, icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium
+              transition-colors duration-150
+              ${activeTab === id ? "text-violet-600" : "text-gray-400 hover:text-gray-600"}`}
+          >
+            <span className="text-xl leading-none">{icon}</span>
+            <span>{label}</span>
+            {activeTab === id && (
+              <span className="w-1 h-1 rounded-full bg-violet-600" />
+            )}
+          </button>
+        ))}
+      </nav>
+
+    </div>
+  );
+}
+
+export default App;
