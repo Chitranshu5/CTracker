@@ -172,22 +172,21 @@ const FriendDetailPage = () => {
     setTransactions(data);
     setLoading(false);
   };
+
+  
   const balance = transactions.reduce((total, tx) => {
-  if (tx.transaction_type === "gave") {
-    return total + Number(tx.amount);
-  }
+    if (tx.transaction_type === "gave") {
+      return total + Number(tx.amount);
+    }
 
-  if (
-    tx.transaction_type === "receive" ||
-    tx.transaction_type === "received"
-  ) {
-    return total - Number(tx.amount);
-  }
+    if (tx.transaction_type === "received") {
+      return total - Number(tx.amount);
+    }
 
-  return total;
-}, 0);
+    return total;
+  }, 0);
 
-const direction = balance >= 0 ? "owes" : "owed";
+  const direction = balance >= 0 ? "owes" : "owed";
 
   return (
     <div className="relative w-full h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col overflow-hidden">
@@ -227,29 +226,25 @@ const direction = balance >= 0 ? "owes" : "owed";
         </div>
 
         {/* Balance summary */}
-      <div
-  className={`mt-4 rounded-xl p-4 flex items-center justify-between ${
-    direction === "owes"
-      ? "bg-orange-50"
-      : "bg-emerald-50"
-  }`}
->
-  <span className="text-sm text-gray-600">
-    {direction === "owes"
-      ? `${friend.name} owes you`
-      : `You owe ${friend.name}`}
-  </span>
+        <div
+          className={`mt-4 rounded-xl p-4 flex items-center justify-between ${
+            direction === "owes" ? "bg-orange-50" : "bg-emerald-50"
+          }`}
+        >
+          <span className="text-sm text-gray-600">
+            {direction === "owes"
+              ? `${friend.name} owes you`
+              : `You owe ${friend.name}`}
+          </span>
 
-  <span
-    className={`text-lg font-bold ${
-      direction === "owes"
-        ? "text-orange-600"
-        : "text-emerald-600"
-    }`}
-  >
-    {formatBalance(balance)}
-  </span>
-</div>
+          <span
+            className={`text-lg font-bold ${
+              direction === "owes" ? "text-orange-600" : "text-emerald-600"
+            }`}
+          >
+            {formatBalance(balance)}
+          </span>
+        </div>
 
         {/* Quick actions */}
         <div className="flex gap-2 mt-3">
@@ -309,9 +304,7 @@ const direction = balance >= 0 ? "owes" : "owed";
                   <p className="text-sm font-medium text-gray-800 truncate">
                     {tx.description || "No description"}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    {tx.category} .
-                  </p>
+                  <p className="text-xs text-gray-500">{tx.category} .</p>
 
                   <p className="text-xs text-gray-500">
                     {new Date(tx.created_at).toLocaleString("en-IN", {

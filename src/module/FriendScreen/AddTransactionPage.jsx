@@ -154,6 +154,7 @@ const AddTransactionPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialType = searchParams.get('type') === 'received' ? 'received' : 'gave';
+  console.log(initialType)
 
   const [type, setType] = useState(initialType);
   const [amount, setAmount] = useState('');
@@ -234,7 +235,7 @@ const AddTransactionPage = () => {
           <div>
             <p className="text-xs font-semibold text-indigo-400 tracking-wide">Add transaction</p>
             <h1 className="text-lg font-bold text-gray-800">
-              {type === 'give' ? 'You Gave' : 'You Got'}
+              {type === 'gave' ? 'You Gave' : 'You Got'}
             </h1>
           </div>
         </div>
@@ -248,7 +249,7 @@ const AddTransactionPage = () => {
           <button
             onClick={() => setType('give')}
             className={`flex-1 text-sm font-semibold py-2 rounded-lg transition ${
-              type === 'give' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500'
+              type === 'gave' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500'
             }`}
           >
             You Gave
@@ -256,7 +257,7 @@ const AddTransactionPage = () => {
           <button
             onClick={() => setType('receive')}
             className={`flex-1 text-sm font-semibold py-2 rounded-lg transition ${
-              type === 'receive' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500'
+              type === 'received' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500'
             }`}
           >
             You Got
@@ -318,7 +319,7 @@ const AddTransactionPage = () => {
           disabled={!amount || saving}
           className={`w-full py-3 rounded-xl text-sm font-semibold transition active:scale-95 ${
             amount && !saving
-              ? type === 'give' ? 'bg-orange-500 text-white' : 'bg-emerald-500 text-white'
+              ? type === 'gave' ? 'bg-orange-500 text-white' : 'bg-emerald-500 text-white'
               : 'bg-gray-200 text-gray-400'
           }`}
         >
