@@ -143,6 +143,9 @@
 
 // export default AddTransactionPage;
 // AddTransactionPage.jsximport 
+
+
+
 import React, { useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useFriends } from '../../hooks/useFriends';
@@ -175,6 +178,7 @@ const AddTransactionPage = () => {
         category,
         description,
         amount: Number(amount),
+        is_settled:false,
       },
       { onSuccess: () => navigate(`/friends/${id}`) }
     );
