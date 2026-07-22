@@ -3,6 +3,7 @@ import { supabase } from '../store/Superbase';
 
 const addTransaction = async (payload) => {
   const { data, error } = await supabase.from('transactions').insert(payload).select();
+  console.log(payload)
   if (error) throw error;
   return data;
 };
