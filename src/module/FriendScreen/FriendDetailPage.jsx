@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFriends, useTransactions } from "../../hooks/useFriends";
 import { CATEGORIES } from "../../constants/Colors";
@@ -18,11 +18,13 @@ const FriendDetailPage = () => {
     return balance > 0 ? `+₹${absBalance}` : `-₹${absBalance}`;
   };
 
-  const balance = transactions.reduce((total, tx) => {
-    if (tx.transaction_type === "gave") return total + Number(tx.amount);
-    if (tx.transaction_type === "received") return total - Number(tx.amount);
-    return total;
-  }, 0);
+const balance = useMemo(() => transactions.reduce((total, tx) => {
+  if (tx.is_settled) return total;
+  if (tx.transaction_type === "gave") return total + Number(tx.amount);
+  if (tx.transaction_type === "received") return total - Number(tx.amount);
+  return total;
+}, 0), [transactions]);
+
 
   const direction = balance >= 0 ? "owes" : "owed";
 
@@ -238,101 +240,130 @@ const FriendDetailPage = () => {
             </div>
           ) : (
             transactions.map((tx, index) => {
-              const categoryData = CATEGORIES.find(
-                (c) => c.name === tx.category,
-              ) || { icon: "📦", name: "Other" };
+  const categoryData = CATEGORIES.find(
+    (c) => c.name === tx.category,
+  ) || { icon: "📦", name: "Other" };
 
-              return (
-                <div
-                  key={tx.id}
-                  onClick={() =>
-                    navigate(`/transaction/${tx.id}`, {
-                      state: {
-                        transaction: tx,
-                        friendName: friend.name,
-                        friendId: friend.id,
-                      },
-                    })
-                  }
-                  className="group bg-white/80 backdrop-blur-sm rounded-2xl p-3.5 border border-gray-100/60 shadow-sm hover:shadow-lg hover:border-indigo-200/40 transition-all duration-300 flex items-center gap-3.5 animate-fade-in-up"
-                  style={{
-                    animationDelay: `${index * 50}ms`,
-                    animationFillMode: "both",
-                  }}
-                >
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-base flex-shrink-0 transition-transform group-hover:scale-105 duration-200 ${
-                      tx.transaction_type === "gave"
-                        ? "bg-orange-100/80 text-orange-600"
-                        : "bg-emerald-100/80 text-emerald-600"
-                    }`}
-                  >
-                    {tx.transaction_type === "gave" ? (
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2.5}
-                          d="M5 15l7-7 7 7"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2.5}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    )}
-                  </div>
+  const isSettled = !!tx.is_settled;
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800 truncate">
-                      {tx.description || "No description"}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-400 flex items-center gap-1">
-                        <span>{categoryData.icon}</span>
-                        <span>{tx.category}</span>
-                      </span>
-                      <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                      <span className="text-xs text-gray-400">
-                        {new Date(tx.created_at).toLocaleString("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true,
-                        })}
-                      </span>
-                    </div>
-                  </div>
+  return (
+    <div
+      key={tx.id}
+      onClick={() =>
+        navigate(`/transaction/${tx.id}`, {
+          state: {
+            transaction: tx,
+            friendName: friend.name,
+            friendId: friend.id,
+          },
+        })
+      }
+      className={`group relative overflow-hidden rounded-2xl p-3.5 border shadow-sm hover:shadow-lg transition-all duration-300 flex items-center gap-3.5 animate-fade-in-up ${
+        isSettled
+          ? "bg-emerald-50/60 backdrop-blur-md border-emerald-200/60 hover:border-emerald-300/60"
+          : "bg-white/80 backdrop-blur-sm border-gray-100/60 hover:border-indigo-200/40"
+      }`}
+      style={{
+        animationDelay: `${index * 50}ms`,
+        animationFillMode: "both",
+      }}
+    >
+      <div
+        className={`w-10 h-10 rounded-xl flex items-center justify-center text-base flex-shrink-0 transition-transform group-hover:scale-105 duration-200 ${
+          tx.transaction_type === "gave"
+            ? "bg-orange-100/80 text-orange-600"
+            : "bg-emerald-100/80 text-emerald-600"
+        }`}
+      >
+        {tx.transaction_type === "gave" ? (
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M5 15l7-7 7 7"
+            />
+          </svg>
+        ) : (
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        )}
+      </div>
 
-                  <span
-                    className={`text-sm font-bold ${
-                      tx.transaction_type === "gave"
-                        ? "text-orange-600"
-                        : "text-emerald-600"
-                    }`}
-                  >
-                    {tx.transaction_type === "gave" ? "−" : "+"}₹{tx.amount}
-                  </span>
-                </div>
-              );
-            })
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-semibold text-gray-800 truncate">
+            {tx.description || "No description"}
+          </p>
+          {isSettled && (
+            <span className="flex-shrink-0 w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+              <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-xs text-gray-400 flex items-center gap-1">
+            <span>{categoryData.icon}</span>
+            <span>{tx.category}</span>
+          </span>
+          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+          {isSettled ? (
+            <span className="text-xs text-emerald-600 font-medium">
+              Settled{" "}
+              {new Date(tx.settled_at).toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })}
+            </span>
+          ) : (
+            <span className="text-xs text-gray-400">
+              {new Date(tx.created_at).toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <span
+        className={`text-sm font-bold ${
+          tx.transaction_type === "gave"
+            ? "text-orange-600"
+            : "text-emerald-600"
+        }`}
+      >
+        {tx.transaction_type === "gave" ? "−" : "+"}₹{tx.amount}
+      </span>
+    </div>
+  );
+})
           )}
         </div>
       </div>
