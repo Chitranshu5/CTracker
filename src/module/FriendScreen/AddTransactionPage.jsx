@@ -142,87 +142,46 @@
 // };
 
 // export default AddTransactionPage;
-// AddTransactionPage.jsx
-import React, { useState, useEffect } from 'react';
+// AddTransactionPage.jsximport 
+import React, { useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '../../store/Superbase';
-
-const categories = ['Food', 'Travel', 'Rent', 'Shopping', 'Entertainment', 'Other'];
+import { useFriends } from '../../hooks/useFriends';
+import { useAddTransaction } from '../../hooks/useAddTransaction';
+import { CATEGORIES } from '../../constants/Colors';
 
 const AddTransactionPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialType = searchParams.get('type') === 'received' ? 'received' : 'gave';
-  console.log(initialType)
+
+  const { data: friends = [] } = useFriends();
+  const friend = friends.find((f) => String(f.id) === id);
+
+  const { mutate: saveTransaction, isPending: saving, error: saveError } = useAddTransaction(id);
 
   const [type, setType] = useState(initialType);
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState(categories[0]);
+  const [category, setCategory] = useState(CATEGORIES[0].name);
   const [description, setDescription] = useState('');
-  const [friend, setFriend] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchFriend();
-  }, [id]);
+  const handleSave = () => {
+    if (!amount || !friend) return;
 
-  const fetchFriend = async () => {
-    console.log('Fetching friend with id:', id);
-
-    const { data, error } = await supabase
-      .from('User')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      console.log('Error fetching friend:', error);
-      return;
-    }
-
-    console.log('Friend fetched:', data);
-    setFriend(data);
-  };
-
-  const handleSave = async () => {
-    if (!amount || !friend) {
-      console.log('Save blocked — amount or friend missing:', { amount, friend });
-      return;
-    }
-
-    setSaving(true);
-    setError(null);
-
-    const payload = {
-      user_id: id,
-      // username:username,
-      transaction_type: type,
-      category,
-      description,
-      amount: Number(amount),
-    };
-
-    console.log('Saving transaction with payload:', payload);
-
-    const { data, error } = await supabase.from('transactions').insert(payload).select();
-
-    setSaving(false);
-
-    if (error) {
-      console.log('Error saving transaction:', error);
-      setError('Something went wrong saving this transaction. Try again.');
-      return;
-    }
-
-    console.log('Transaction saved successfully:', data);
-   navigate(`/friends`);
+    saveTransaction(
+      {
+        user_id: id,
+        transaction_type: type,
+        category,
+        description,
+        amount: Number(amount),
+      },
+      { onSuccess: () => navigate(`/friends/${id}`) }
+    );
   };
 
   return (
     <div className="relative w-full h-full bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col overflow-hidden">
-
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-5 pt-6 pb-4 flex-shrink-0 shadow-sm">
         <div className="flex items-center gap-3">
@@ -236,6 +195,7 @@ const AddTransactionPage = () => {
             <p className="text-xs font-semibold text-indigo-400 tracking-wide">Add transaction</p>
             <h1 className="text-lg font-bold text-gray-800">
               {type === 'gave' ? 'You Gave' : 'You Got'}
+              {friend ? ` — ${friend.name}` : ''}
             </h1>
           </div>
         </div>
@@ -247,7 +207,7 @@ const AddTransactionPage = () => {
         {/* Type toggle */}
         <div className="flex bg-gray-100 rounded-xl p-1">
           <button
-            onClick={() => setType('give')}
+            onClick={() => setType('gave')}
             className={`flex-1 text-sm font-semibold py-2 rounded-lg transition ${
               type === 'gave' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500'
             }`}
@@ -255,7 +215,7 @@ const AddTransactionPage = () => {
             You Gave
           </button>
           <button
-            onClick={() => setType('receive')}
+            onClick={() => setType('received')}
             className={`flex-1 text-sm font-semibold py-2 rounded-lg transition ${
               type === 'received' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500'
             }`}
@@ -279,21 +239,22 @@ const AddTransactionPage = () => {
           </div>
         </div>
 
-        {/* Category */}
+        {/* Category — horizontal scroll */}
         <div>
-          <label className="text-xs font-semibold text-gray-500 mb-1 block">Category</label>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
+          <label className="text-xs font-semibold text-gray-500 mb-2 block">Category</label>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-5 px-5">
+            {CATEGORIES.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setCategory(cat)}
-                className={`text-xs font-medium px-3 py-1.5 rounded-full transition ${
-                  category === cat
-                    ? 'bg-indigo-500 text-white'
-                    : 'bg-white text-gray-600 border border-gray-200'
+                key={cat.name}
+                onClick={() => setCategory(cat.name)}
+                className={`flex flex-col items-center gap-1 py-3 px-4 rounded-xl border flex-shrink-0 transition active:scale-95 ${
+                  category === cat.name
+                    ? 'bg-indigo-500 border-indigo-500 text-white shadow-md'
+                    : 'bg-white border-gray-200 text-gray-600'
                 }`}
               >
-                {cat}
+                <span className="text-xl">{cat.icon}</span>
+                <span className="text-[11px] font-medium whitespace-nowrap">{cat.name}</span>
               </button>
             ))}
           </div>
@@ -311,9 +272,8 @@ const AddTransactionPage = () => {
           />
         </div>
 
-        {error && <p className="text-xs text-red-500">{error}</p>}
+        {saveError && <p className="text-xs text-red-500">Something went wrong saving this transaction. Try again.</p>}
 
-        {/* Save button — sits right under description, in normal flow */}
         <button
           onClick={handleSave}
           disabled={!amount || saving}

@@ -102,81 +102,229 @@
 
 // export default FriendsPage;
 
-// FriendsPage.jsx
-// FriendsPage.jsx
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "../../store/Superbase";
+// FriendsPage.jsx  that is code with working with self api calling 
 
-const COLORS = [
-  { bgColor: "#EEEDFE", textColor: "#534AB7" },
-  { bgColor: "#E1F5EE", textColor: "#0F6E56" },
-  { bgColor: "#FAECE7", textColor: "#993C1D" },
-  { bgColor: "#FBEAF0", textColor: "#993556" },
-  { bgColor: "#E0F7FA", textColor: "#00695C" },
-  { bgColor: "#FCE4EC", textColor: "#880E4F" },
-];
+// import React, { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { supabase } from "../../store/Superbase";
+// import { COLORS } from "../../constants/Colors";
+
+
+
+// const FriendsPage = () => {
+//   const navigate = useNavigate();
+
+//   const [friends, setFriends] = useState([]);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     fetchFriends();
+//   }, []);
+
+//   const fetchFriends = async () => {
+//     setLoading(true);
+
+//     const { data, error } = await supabase
+//       .from("User")
+//       .select("id, username, email, phone_number")
+//       .order("id", { ascending: true });
+
+//     if (error) {
+//       console.error(error);
+//       alert(error.message);
+//       setLoading(false);
+//       return;
+//     }
+
+//     const formattedFriends = data.map((user, index) => {
+//       const color = COLORS[index % COLORS.length];
+
+//       return {
+//         id: user.id,
+//         name: user.username,
+//         email: user.email,
+//         phone: user.phone_number,
+//         initials: user.username
+//           .split(" ")
+//           .map((word) => word[0])
+//           .join("")
+//           .toUpperCase()
+//           .slice(0, 2),
+//         bgColor: color.bgColor,
+//         textColor: color.textColor,
+
+//         // Replace later with transaction calculation
+//         balance: 0,
+//         direction: "owed",
+//       };
+//     });
+
+//     setFriends(formattedFriends);
+//     setLoading(false);
+//   };
+
+//   const filteredFriends = friends.filter((friend) =>
+//     friend.name.toLowerCase().includes(searchQuery.toLowerCase()),
+//   );
+
+//   const formatBalance = (balance) => {
+//     const absBalance = Math.abs(balance);
+
+//     return balance >= 0 ? `+₹${absBalance}` : `-₹${absBalance}`;
+//   };
+
+//   return (
+//     <div className="relative w-full h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col overflow-hidden">
+//       {/* Header */}
+//       <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-5 pt-6 pb-3 flex-shrink-0 shadow-sm">
+//         <div className="flex items-center justify-between mb-3">
+//           <div>
+//             <p className="text-xs font-semibold text-indigo-400 tracking-wide">
+//               Friends
+//             </p>
+//             <h1 className="text-xl font-bold text-gray-800">Your network</h1>
+//           </div>
+
+//           <button
+//             onClick={() => navigate("/add-friend")}
+//             className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 active:scale-95 transition"
+//           >
+//             <span className="text-xl">➕</span>
+//           </button>
+//         </div>
+
+//         {/* Search */}
+//         <div className="relative">
+//           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+//             🔍
+//           </span>
+
+//           <input
+//             type="text"
+//             placeholder="Search friends..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="w-full pl-9 pr-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+//           />
+//         </div>
+//       </div>
+
+//       {/* Friends List */}
+//       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 pt-5 pb-24">
+//         {loading ? (
+//           <div className="text-center py-10 text-gray-500">
+//             Loading friends...
+//           </div>
+//         ) : (
+//           <div className="space-y-3">
+//             {filteredFriends.length === 0 ? (
+//               <div className="text-center py-12">
+//                 <span className="text-5xl mb-3 block">👥</span>
+//                 <p className="text-gray-500 text-sm">No friends found</p>
+//               </div>
+//             ) : (
+//               filteredFriends.map((friend) => (
+//                 <div
+//                   key={friend.id}
+//                   onClick={() =>
+//                     navigate(`/friends/${friend.id}`, {
+//                       state: { friend },
+//                     })
+//                   }
+//                   className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 active:bg-gray-50 transition flex items-center gap-3 cursor-pointer"
+//                 >
+//                   {/* Avatar */}
+//                   <div
+//                     className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold shadow-md ring-2 ring-white flex-shrink-0"
+//                     style={{
+//                       backgroundColor: friend.bgColor,
+//                       color: friend.textColor,
+//                     }}
+//                   >
+//                     {friend.initials}
+//                   </div>
+
+//                   {/* Info */}
+//                   <div className="flex-1 min-w-0">
+//                     <div className="flex items-center justify-between">
+//                       <h3 className="font-semibold text-gray-800">
+//                         {friend.name}
+//                       </h3>
+
+//                       <span
+//                         className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+//                           friend.direction === "owes"
+//                             ? "bg-orange-100 text-orange-600"
+//                             : "bg-emerald-100 text-emerald-600"
+//                         }`}
+//                       >
+//                         {formatBalance(friend.balance)}
+//                       </span>
+//                     </div>
+
+//                     <p className="text-xs text-gray-500 truncate">
+//                       {friend.phone || "No phone number"}
+//                     </p>
+
+//                     <div className="flex gap-2 mt-1">
+//                       <button
+//                         onClick={(e) => e.stopPropagation()}
+//                         className="text-[10px] font-medium text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full"
+//                       >
+//                         Message
+//                       </button>
+
+//                       <button
+//                         onClick={(e) => e.stopPropagation()}
+//                         className="text-[10px] font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full"
+//                       >
+//                         Settle up
+//                       </button>
+//                     </div>
+//                   </div>
+
+//                   <button
+//                     onClick={(e) => e.stopPropagation()}
+//                     className="text-gray-400 p-1"
+//                   >
+//                     <span className="text-lg">⋮</span>
+//                   </button>
+//                 </div>
+//               ))
+//             )}
+//           </div>
+//         )}
+//       </div>
+
+//       <div className="h-16"></div>
+//     </div>
+//   );
+// };
+
+// export default FriendsPage;
+
+
+
+import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useFriendsWithBalances } from "../../hooks/useFriendsWithBalances";
 
 const FriendsPage = () => {
   const navigate = useNavigate();
-
-  const [friends, setFriends] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+const { data: friends = [], isLoading, error } = useFriendsWithBalances();
 
-  useEffect(() => {
-    fetchFriends();
-  }, []);
+  console.log("[FriendsPage] render — got", friends.length, "friends from cache, isLoading:", isLoading);
 
-  const fetchFriends = async () => {
-    setLoading(true);
-
-    const { data, error } = await supabase
-      .from("User")
-      .select("id, username, email, phone_number")
-      .order("id", { ascending: true });
-
-    if (error) {
-      console.error(error);
-      alert(error.message);
-      setLoading(false);
-      return;
-    }
-
-    const formattedFriends = data.map((user, index) => {
-      const color = COLORS[index % COLORS.length];
-
-      return {
-        id: user.id,
-        name: user.username,
-        email: user.email,
-        phone: user.phone_number,
-        initials: user.username
-          .split(" ")
-          .map((word) => word[0])
-          .join("")
-          .toUpperCase()
-          .slice(0, 2),
-        bgColor: color.bgColor,
-        textColor: color.textColor,
-
-        // Replace later with transaction calculation
-        balance: 0,
-        direction: "owed",
-      };
-    });
-
-    setFriends(formattedFriends);
-    setLoading(false);
-  };
-
-  const filteredFriends = friends.filter((friend) =>
-    friend.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredFriends = useMemo(() => {
+    return friends.filter((friend) =>
+      friend.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [friends, searchQuery]);
 
   const formatBalance = (balance) => {
     const absBalance = Math.abs(balance);
-
     return balance >= 0 ? `+₹${absBalance}` : `-₹${absBalance}`;
   };
 
@@ -186,12 +334,9 @@ const FriendsPage = () => {
       <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-5 pt-6 pb-3 flex-shrink-0 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-xs font-semibold text-indigo-400 tracking-wide">
-              Friends
-            </p>
+            <p className="text-xs font-semibold text-indigo-400 tracking-wide">Friends</p>
             <h1 className="text-xl font-bold text-gray-800">Your network</h1>
           </div>
-
           <button
             onClick={() => navigate("/add-friend")}
             className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 active:scale-95 transition"
@@ -200,12 +345,8 @@ const FriendsPage = () => {
           </button>
         </div>
 
-        {/* Search */}
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-            🔍
-          </span>
-
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
           <input
             type="text"
             placeholder="Search friends..."
@@ -218,10 +359,10 @@ const FriendsPage = () => {
 
       {/* Friends List */}
       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 pt-5 pb-24">
-        {loading ? (
-          <div className="text-center py-10 text-gray-500">
-            Loading friends...
-          </div>
+        {isLoading ? (
+          <div className="text-center py-10 text-gray-500">Loading friends...</div>
+        ) : error ? (
+          <div className="text-center py-10 text-red-500 text-sm">{error.message}</div>
         ) : (
           <div className="space-y-3">
             {filteredFriends.length === 0 ? (
@@ -233,31 +374,19 @@ const FriendsPage = () => {
               filteredFriends.map((friend) => (
                 <div
                   key={friend.id}
-                  onClick={() =>
-                    navigate(`/friends/${friend.id}`, {
-                      state: { friend },
-                    })
-                  }
+                  onClick={() => navigate(`/friends/${friend.id}`, { state: { friend } })}
                   className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 active:bg-gray-50 transition flex items-center gap-3 cursor-pointer"
                 >
-                  {/* Avatar */}
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold shadow-md ring-2 ring-white flex-shrink-0"
-                    style={{
-                      backgroundColor: friend.bgColor,
-                      color: friend.textColor,
-                    }}
+                    style={{ backgroundColor: friend.bgColor, color: friend.textColor }}
                   >
                     {friend.initials}
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-800">
-                        {friend.name}
-                      </h3>
-
+                      <h3 className="font-semibold text-gray-800">{friend.name}</h3>
                       <span
                         className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                           friend.direction === "owes"
@@ -268,32 +397,18 @@ const FriendsPage = () => {
                         {formatBalance(friend.balance)}
                       </span>
                     </div>
-
-                    <p className="text-xs text-gray-500 truncate">
-                      {friend.phone || "No phone number"}
-                    </p>
-
+                    <p className="text-xs text-gray-500 truncate">{friend.phone || "No phone number"}</p>
                     <div className="flex gap-2 mt-1">
-                      <button
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[10px] font-medium text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full"
-                      >
+                      <button onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">
                         Message
                       </button>
-
-                      <button
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[10px] font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full"
-                      >
+                      <button onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
                         Settle up
                       </button>
                     </div>
                   </div>
 
-                  <button
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-gray-400 p-1"
-                  >
+                  <button onClick={(e) => e.stopPropagation()} className="text-gray-400 p-1">
                     <span className="text-lg">⋮</span>
                   </button>
                 </div>

@@ -1,7 +1,6 @@
-// AddFriendPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../store/Superbase";
+import { useAddFriend } from "../../hooks/useAddTransaction";
 
 const AddFriendPage = () => {
   const navigate = useNavigate();
@@ -11,7 +10,9 @@ const AddFriendPage = () => {
   const [phone, setPhone] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleSave = async () => {
+  const { mutate: saveFriend, isPending: saving, error: saveError } = useAddFriend();
+
+  const handleSave = () => {
     if (!name.trim()) {
       alert("Username is required");
       return;
@@ -19,35 +20,25 @@ const AddFriendPage = () => {
 
     setSuccessMessage("");
 
-    const { data, error } = await supabase
-      .from("User")
-      .insert([
-        {
-          username: name,
-          email: email,
-          phone_number: phone,
+    saveFriend(
+      { name, email, phone },
+      {
+        onSuccess: () => {
+          setSuccessMessage("✅ User Added Successfully!");
+          setName("");
+          setEmail("");
+          setPhone("");
+
+          setTimeout(() => {
+            setSuccessMessage("");
+            navigate("/");
+          }, 1500);
         },
-      ])
-      .select();
-
-    if (error) {
-      console.error(error);
-      alert(error.message);
-      return;
-    }
-
-    console.log("Saved User:", data);
-
-    setSuccessMessage("✅ User Added Successfully!");
-
-    setName("");
-    setEmail("");
-    setPhone("");
-
-    setTimeout(() => {
-      setSuccessMessage("");
-      navigate("/");
-    }, 1500);
+        onError: (err) => {
+          alert(err.message);
+        },
+      }
+    );
   };
 
   return (
@@ -63,12 +54,8 @@ const AddFriendPage = () => {
           </button>
 
           <div>
-            <p className="text-xs font-semibold text-indigo-400 tracking-wide">
-              New contact
-            </p>
-            <h1 className="text-lg font-bold text-gray-800">
-              Add Friend
-            </h1>
+            <p className="text-xs font-semibold text-indigo-400 tracking-wide">New contact</p>
+            <h1 className="text-lg font-bold text-gray-800">Add Friend</h1>
           </div>
         </div>
       </div>
@@ -80,18 +67,12 @@ const AddFriendPage = () => {
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold shadow-md">
             {name.trim() ? name.trim().slice(0, 2).toUpperCase() : "?"}
           </div>
-
-          <span className="text-xs text-gray-400">
-            Profile picture (optional, add later)
-          </span>
+          <span className="text-xs text-gray-400">Profile picture (optional, add later)</span>
         </div>
 
         {/* Name */}
         <div>
-          <label className="text-xs font-semibold text-gray-500 mb-1 block">
-            Name
-          </label>
-
+          <label className="text-xs font-semibold text-gray-500 mb-1 block">Name</label>
           <input
             type="text"
             placeholder="Friend's name"
@@ -103,10 +84,7 @@ const AddFriendPage = () => {
 
         {/* Phone */}
         <div>
-          <label className="text-xs font-semibold text-gray-500 mb-1 block">
-            Phone
-          </label>
-
+          <label className="text-xs font-semibold text-gray-500 mb-1 block">Phone</label>
           <input
             type="tel"
             placeholder="+91 98765 43210"
@@ -118,10 +96,7 @@ const AddFriendPage = () => {
 
         {/* Email */}
         <div>
-          <label className="text-xs font-semibold text-gray-500 mb-1 block">
-            Email
-          </label>
-
+          <label className="text-xs font-semibold text-gray-500 mb-1 block">Email</label>
           <input
             type="email"
             placeholder="friend@example.com"
@@ -141,14 +116,12 @@ const AddFriendPage = () => {
         {/* Save Button */}
         <button
           onClick={handleSave}
-          disabled={!name}
+          disabled={!name || saving}
           className={`w-full py-3 rounded-xl text-sm font-semibold transition active:scale-95 ${
-            name
-              ? "bg-indigo-500 text-white"
-              : "bg-gray-200 text-gray-400"
+            name && !saving ? "bg-indigo-500 text-white" : "bg-gray-200 text-gray-400"
           }`}
         >
-          Save Friend
+          {saving ? "Saving..." : "Save Friend"}
         </button>
       </div>
     </div>
