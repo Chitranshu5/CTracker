@@ -390,6 +390,7 @@ const TransactionDetailPage = () => {
         </div>
 
         {/* Repayments Card */}
+        {!is_settled && (
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-100/60 shadow-sm p-5 space-y-5">
           <div className="flex items-center justify-between">
             <div>
@@ -482,6 +483,7 @@ const TransactionDetailPage = () => {
             </p>
           )}
         </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex gap-3 pb-2">
