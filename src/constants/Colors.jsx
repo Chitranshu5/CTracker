@@ -32,3 +32,12 @@ export const CATEGORIES = [
   { name: 'Education', icon: '📚' },
   { name: 'Other', icon: '📦' },
 ];
+
+
+ export const transactions = [
+  { id: 't1', friend: { name: 'Arjun', initials: 'AJ', bgColor: '#EEEDFE', textColor: '#534AB7' }, description: 'Dinner at Buhari', type: 'give', amount: 600, date: 'Today, 7pm', category: '🍽️' },
+  { id: 't2', friend: { name: 'Priya', initials: 'PR', bgColor: '#E1F5EE', textColor: '#0F6E56' }, description: 'Movie tickets', type: 'recv', amount: 800, date: 'Yesterday', category: '🎬' },
+  { id: 't3', friend: { name: 'Karan', initials: 'KA', bgColor: '#FAECE7', textColor: '#993C1D' }, description: 'Auto fare', type: 'give', amount: 150, date: 'Yesterday', category: '🚗' },
+  { id: 't4', friend: { name: 'Divya', initials: 'DV', bgColor: '#FBEAF0', textColor: '#993556' }, description: 'Groceries', type: 'give', amount: 1400, date: 'Mon', category: '🛒' },
+  { id: 't5', friend: { name: 'Arjun', initials: 'AJ', bgColor: '#EEEDFE', textColor: '#534AB7' }, description: 'Petrol split', type: 'give', amount: 600, date: 'Sun', category: '⛽' },
+];
